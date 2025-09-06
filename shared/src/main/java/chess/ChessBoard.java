@@ -58,13 +58,13 @@ public class ChessBoard {
     public void setStartingPosition() {
         ChessPiece.PieceType[] backRank = {
             ChessPiece.PieceType.ROOK,
-                ChessPiece.PieceType.KNIGHT,
-                ChessPiece.PieceType.BISHOP,
-                ChessPiece.PieceType.QUEEN,
-                ChessPiece.PieceType.KING,
-                ChessPiece.PieceType.BISHOP,
-                ChessPiece.PieceType.KNIGHT,
-                ChessPiece.PieceType.ROOK
+            ChessPiece.PieceType.KNIGHT,
+            ChessPiece.PieceType.BISHOP,
+            ChessPiece.PieceType.QUEEN,
+            ChessPiece.PieceType.KING,
+            ChessPiece.PieceType.BISHOP,
+            ChessPiece.PieceType.KNIGHT,
+            ChessPiece.PieceType.ROOK
         };
 
         // White Pieces
