@@ -1,7 +1,6 @@
 package chess;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -14,10 +13,12 @@ public class ChessPiece {
 
     private final ChessGame.TeamColor pieceColor;
     private final PieceType type;
+    private final PieceMovesCalculator movesCalculator;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
+        this.movesCalculator = createCalculator(type);
     }
 
     /**
@@ -54,9 +55,18 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        // TEMPORARY SOLUTION TO PASS TESTS
-        // NEED TO ADD IN LOGIC FOR ALLOWED MOVES
-        return List.of();
+        return movesCalculator.pieceMoves(board, myPosition);
+    }
+
+    private PieceMovesCalculator createCalculator(PieceType type) {
+        return switch (type) {
+            case ROOK -> new RookMovesCalculator();
+            case BISHOP -> new BishopMovesCalculator();
+            case KNIGHT -> new KnightMovesCalculator();
+            case KING -> new KingMovesCalculator();
+            case QUEEN -> new QueenMovesCalculator();
+            case PAWN -> new PawnMovesCalculator();
+        };
     }
 
     @Override
