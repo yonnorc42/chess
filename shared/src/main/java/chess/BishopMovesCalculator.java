@@ -11,10 +11,10 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
         ChessGame.TeamColor myColor = board.getPiece(myPosition).getTeamColor();
 
         int[][] directions = {
-                {-1,  1}, // up-right
-                {-1, -1}, // up-left
-                { 1,  1}, // down-right
-                { 1, -1}  // down-left
+                {-1,  1},
+                {-1, -1},
+                { 1,  1},
+                { 1, -1}
         };
 
         for (int[] dir : directions) {
