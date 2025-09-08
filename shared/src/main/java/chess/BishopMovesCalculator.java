@@ -26,7 +26,9 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
                 col += dir[1];
 
                 // Stop if off board
-                if (row < 1 || row > 8 || col < 1 || col > 8) break;
+                if (row < 1 || row > 8 || col < 1 || col > 8) {
+                    break;
+                }
                 ChessPosition possiblePosition = new ChessPosition(row, col);
                 ChessMove possibleMove = new ChessMove(myPosition, possiblePosition, null);
                 // Spot is empty
