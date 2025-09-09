@@ -3,7 +3,7 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static chess.MoveCalculatorUtils.iterateDirections;
+import static chess.MoveCalculatorUtils.slidingMoves;
 
 public class RookMovesCalculator implements PieceMovesCalculator {
     @Override
@@ -17,7 +17,7 @@ public class RookMovesCalculator implements PieceMovesCalculator {
                 { 0,-1 }
         };
 
-        iterateDirections(board, myPosition, directions, validMoves);
+        slidingMoves(board, myPosition, directions, validMoves);
         return validMoves;
     }
 }
