@@ -85,7 +85,40 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        ChessPiece movingPiece = board.getPiece(move.getStartPosition());
+        if (movingPiece == null || movingPiece.getTeamColor() != teamTurn) {
+            throw new InvalidMoveException("No piece of your team at start position");
+        }
+
+        Collection<ChessMove> moves = validMoves(move.getStartPosition());
+        if (moves == null || !moves.contains(move)) {
+            throw new InvalidMoveException("Move not valid");
+        }
+
+        // Save captured piece for undo
+        ChessPiece capturedPiece = board.getPiece(move.getEndPosition());
+        ChessPiece.PieceType promotionType = move.getPromotionPiece();
+
+        // Execute move (check if it's a promoting pawn)
+        if (promotionType == null) {
+            board.addPiece(move.getEndPosition(), movingPiece);
+
+        }
+        else {
+            board.addPiece(move.getEndPosition(), new ChessPiece(teamTurn, promotionType));
+        }
+        board.addPiece(move.getStartPosition(), null);
+
+        // Check if move leaves own king in check
+        if (isInCheck(teamTurn)) {
+            // Undo move
+            board.addPiece(move.getStartPosition(), movingPiece);
+            board.addPiece(move.getEndPosition(), capturedPiece);
+            throw new InvalidMoveException("Move leaves king in check");
+        }
+
+        // Switch turn
+        teamTurn = (teamTurn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
     }
 
     /**
