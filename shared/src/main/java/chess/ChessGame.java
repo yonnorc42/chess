@@ -193,7 +193,9 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        if (!isInCheck(teamColor)) return false;
+        if (!isInCheck(teamColor)) {
+            return false;
+        }
 
         for (ChessPosition pos : getAllBoardPositions()) {
             ChessPiece piece = board.getPiece(pos);
@@ -208,7 +210,9 @@ public class ChessGame {
 
     private boolean hasEscapingMove(ChessPosition startPos, ChessPiece piece, TeamColor teamColor) {
         Collection<ChessMove> moves = validMoves(startPos);
-        if (moves == null) return false;
+        if (moves == null) {
+            return false;
+        }
 
         for (ChessMove move : moves) {
             if (simulateMoveDoesEscapeCheck(startPos, piece, move, teamColor)) {
@@ -243,23 +247,12 @@ public class ChessGame {
         if (isInCheck(teamColor)) {
             return false;
         }
-        Collection<ChessPosition> positions = getAllBoardPositions();
-        for (ChessPosition pos : positions) {
+
+        for (ChessPosition pos : getAllBoardPositions()) {
             ChessPiece piece = board.getPiece(pos);
             if (piece != null && piece.getTeamColor() == teamColor) {
-                Collection<ChessMove> moves = validMoves(pos);
-                if (moves != null) {
-                    for (ChessMove move : moves) {
-                        ChessPiece captured = board.getPiece(move.getEndPosition());
-                        board.addPiece(move.getEndPosition(), piece);
-                        board.addPiece(pos, null);
-                        boolean leavesKingSafe = !isInCheck(teamColor);
-                        board.addPiece(pos, piece);
-                        board.addPiece(move.getEndPosition(), captured);
-                        if (leavesKingSafe) {
-                            return false;
-                        }
-                    }
+                if (hasEscapingMove(pos, piece, teamColor)) {
+                    return false;
                 }
             }
         }
