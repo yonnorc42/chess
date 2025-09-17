@@ -191,25 +191,23 @@ public class ChessGame {
         if (!isInCheck(teamColor)) {
             return false;
         }
-        for (int row = 1; row <= 8; row++) {
-            for (int col = 1; col <= 8; col++) {
-                ChessPosition pos = new ChessPosition(row, col);
-                ChessPiece piece = board.getPiece(pos);
-                if (piece != null && piece.getTeamColor() == teamColor) {
-                    Collection<ChessMove> moves = validMoves(pos);
-                    if (moves != null) {
-                        for (ChessMove move : moves) {
-                            // simulate move
-                            ChessPiece captured = board.getPiece(move.getEndPosition());
-                            board.addPiece(move.getEndPosition(), piece);
-                            board.addPiece(pos, null);
-                            boolean stillInCheck = isInCheck(teamColor);
-                            // undo
-                            board.addPiece(pos, piece);
-                            board.addPiece(move.getEndPosition(), captured);
-                            if (!stillInCheck) {
-                                return false;
-                            }
+        Collection<ChessPosition> positions = getAllBoardPositions();
+        for (ChessPosition pos : positions) {
+            ChessPiece piece = board.getPiece(pos);
+            if (piece != null && piece.getTeamColor() == teamColor) {
+                Collection<ChessMove> moves = validMoves(pos);
+                if (moves != null) {
+                    for (ChessMove move : moves) {
+                        // simulate move
+                        ChessPiece captured = board.getPiece(move.getEndPosition());
+                        board.addPiece(move.getEndPosition(), piece);
+                        board.addPiece(pos, null);
+                        boolean stillInCheck = isInCheck(teamColor);
+                        // undo
+                        board.addPiece(pos, piece);
+                        board.addPiece(move.getEndPosition(), captured);
+                        if (!stillInCheck) {
+                            return false;
                         }
                     }
                 }
@@ -229,23 +227,21 @@ public class ChessGame {
         if (isInCheck(teamColor)) {
             return false;
         }
-        for (int row = 1; row <= 8; row++) {
-            for (int col = 1; col <= 8; col++) {
-                ChessPosition pos = new ChessPosition(row, col);
-                ChessPiece piece = board.getPiece(pos);
-                if (piece != null && piece.getTeamColor() == teamColor) {
-                    Collection<ChessMove> moves = validMoves(pos);
-                    if (moves != null) {
-                        for (ChessMove move : moves) {
-                            ChessPiece captured = board.getPiece(move.getEndPosition());
-                            board.addPiece(move.getEndPosition(), piece);
-                            board.addPiece(pos, null);
-                            boolean leavesKingSafe = !isInCheck(teamColor);
-                            board.addPiece(pos, piece);
-                            board.addPiece(move.getEndPosition(), captured);
-                            if (leavesKingSafe) {
-                                return false;
-                            }
+        Collection<ChessPosition> positions = getAllBoardPositions();
+        for (ChessPosition pos : positions) {
+            ChessPiece piece = board.getPiece(pos);
+            if (piece != null && piece.getTeamColor() == teamColor) {
+                Collection<ChessMove> moves = validMoves(pos);
+                if (moves != null) {
+                    for (ChessMove move : moves) {
+                        ChessPiece captured = board.getPiece(move.getEndPosition());
+                        board.addPiece(move.getEndPosition(), piece);
+                        board.addPiece(pos, null);
+                        boolean leavesKingSafe = !isInCheck(teamColor);
+                        board.addPiece(pos, piece);
+                        board.addPiece(move.getEndPosition(), captured);
+                        if (leavesKingSafe) {
+                            return false;
                         }
                     }
                 }
