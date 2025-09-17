@@ -55,29 +55,29 @@ public class ChessBoard {
         }
     }
 
-    public void setStartingPosition() {
-        ChessPiece.PieceType[] backRank = {
-            ChessPiece.PieceType.ROOK,
-            ChessPiece.PieceType.KNIGHT,
-            ChessPiece.PieceType.BISHOP,
-            ChessPiece.PieceType.QUEEN,
-            ChessPiece.PieceType.KING,
-            ChessPiece.PieceType.BISHOP,
-            ChessPiece.PieceType.KNIGHT,
-            ChessPiece.PieceType.ROOK
-        };
+        public void setStartingPosition() {
+            ChessPiece.PieceType[] backRank = {
+                ChessPiece.PieceType.ROOK,
+                ChessPiece.PieceType.KNIGHT,
+                ChessPiece.PieceType.BISHOP,
+                ChessPiece.PieceType.QUEEN,
+                ChessPiece.PieceType.KING,
+                ChessPiece.PieceType.BISHOP,
+                ChessPiece.PieceType.KNIGHT,
+                ChessPiece.PieceType.ROOK
+            };
 
-        // White Pieces
-        for (int col = 1; col <= 8; col++) {
-            addPiece(new ChessPosition(1, col), new ChessPiece(ChessGame.TeamColor.WHITE, backRank[col - 1]));
-            addPiece(new ChessPosition(2, col), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
+            // White Pieces
+            for (int col = 1; col <= 8; col++) {
+                addPiece(new ChessPosition(1, col), new ChessPiece(ChessGame.TeamColor.WHITE, backRank[col - 1]));
+                addPiece(new ChessPosition(2, col), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
+            }
+            // Black Pieces
+            for (int col = 1; col <= 8; col++) {
+                addPiece(new ChessPosition(8, col), new ChessPiece(ChessGame.TeamColor.BLACK, backRank[col - 1]));
+                addPiece(new ChessPosition(7, col), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
+            }
         }
-        // Black Pieces
-        for (int col = 1; col <= 8; col++) {
-            addPiece(new ChessPosition(8, col), new ChessPiece(ChessGame.TeamColor.BLACK, backRank[col - 1]));
-            addPiece(new ChessPosition(7, col), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
-        }
-    }
 
     @Override
     public boolean equals(Object o) {
