@@ -157,15 +157,20 @@ public class ChessGame {
     private boolean isPositionAttacked(TeamColor attackingColor, ChessPosition attackedPosition) {
         Collection<ChessPosition> positions = getAllBoardPositions();
         for (ChessPosition pos : positions) {
-            ChessPiece piece = board.getPiece(pos);
-            // check if there's an enemy piece in each position
-            if (piece != null && piece.getTeamColor() == attackingColor) {
-                Collection<ChessMove> attackingMoves = piece.pieceMoves(board, pos);
-                for (ChessMove move : attackingMoves) {
-                    if (move.getEndPosition().equals(attackedPosition)) {
-                        return true;
-                    }
-                }
+            if (isEnemyAttacking(attackingColor, pos, attackedPosition)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    private boolean isEnemyAttacking(TeamColor attackingColor, ChessPosition pos, ChessPosition target) {
+        ChessPiece piece = board.getPiece(pos);
+        if (piece == null || piece.getTeamColor() != attackingColor) {
+            return false;
+        }
+        for (ChessMove move : piece.pieceMoves(board, pos)) {
+            if (move.getEndPosition().equals(target)) {
+                return true;
             }
         }
         return false;
@@ -188,32 +193,43 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        if (!isInCheck(teamColor)) {
-            return false;
-        }
-        Collection<ChessPosition> positions = getAllBoardPositions();
-        for (ChessPosition pos : positions) {
+        if (!isInCheck(teamColor)) return false;
+
+        for (ChessPosition pos : getAllBoardPositions()) {
             ChessPiece piece = board.getPiece(pos);
             if (piece != null && piece.getTeamColor() == teamColor) {
-                Collection<ChessMove> moves = validMoves(pos);
-                if (moves != null) {
-                    for (ChessMove move : moves) {
-                        // simulate move
-                        ChessPiece captured = board.getPiece(move.getEndPosition());
-                        board.addPiece(move.getEndPosition(), piece);
-                        board.addPiece(pos, null);
-                        boolean stillInCheck = isInCheck(teamColor);
-                        // undo
-                        board.addPiece(pos, piece);
-                        board.addPiece(move.getEndPosition(), captured);
-                        if (!stillInCheck) {
-                            return false;
-                        }
-                    }
+                if (hasEscapingMove(pos, piece, teamColor)) {
+                    return false;
                 }
             }
         }
         return true;
+    }
+
+    private boolean hasEscapingMove(ChessPosition startPos, ChessPiece piece, TeamColor teamColor) {
+        Collection<ChessMove> moves = validMoves(startPos);
+        if (moves == null) return false;
+
+        for (ChessMove move : moves) {
+            if (simulateMoveDoesEscapeCheck(startPos, piece, move, teamColor)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean simulateMoveDoesEscapeCheck(ChessPosition startPos, ChessPiece piece, ChessMove move, TeamColor teamColor) {
+        ChessPiece captured = board.getPiece(move.getEndPosition());
+
+        board.addPiece(move.getEndPosition(), piece);
+        board.addPiece(startPos, null);
+
+        boolean escapesCheck = !isInCheck(teamColor);
+
+        board.addPiece(startPos, piece);
+        board.addPiece(move.getEndPosition(), captured);
+
+        return escapesCheck;
     }
 
     /**
