@@ -71,11 +71,11 @@ public class ChessPiece {
         };
     }
 
-    public void hasMadeMoveFlagTrue() {
+    public void setMoved() {
         hasMoved = true;
     }
 
-    public boolean hasMadeMove() {
+    public boolean hasMoved() {
         return hasMoved;
     }
 
