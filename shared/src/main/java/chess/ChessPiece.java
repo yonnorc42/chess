@@ -15,12 +15,14 @@ public class ChessPiece {
     private final PieceType type;
     private final PieceMovesCalculator movesCalculator;
     private boolean hasMoved;
+    private boolean justMoved;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
         this.movesCalculator = createCalculator(type);
         this.hasMoved = false;
+        this.justMoved = false;
     }
 
     /**
@@ -77,6 +79,14 @@ public class ChessPiece {
 
     public boolean hasMoved() {
         return hasMoved;
+    }
+
+    public void setJustMoved() {
+        justMoved = true;
+    }
+
+    public boolean justMoved() {
+        return justMoved;
     }
 
     @Override

@@ -72,6 +72,22 @@ public class ChessGame {
             board.addPiece(move.getEndPosition(), capturedPiece);
         }
 
+        // en passant check
+        TeamColor myColor = board.getPiece(startPosition).getTeamColor();
+        int enPassantRow = (myColor == TeamColor.WHITE) ? 5 : 4;
+        int verticalDirection = (myColor == TeamColor.WHITE) ? 1 : -1;
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN && startPosition.getRow() == enPassantRow) {
+            // check for en passant to the right
+            if (canEnPassant(board, startPosition, verticalDirection, true)) {
+                validMoves.add(new ChessMove(startPosition, new ChessPosition(startPosition.getRow()+verticalDirection, startPosition.getColumn()+1), null));
+            }
+            // check for en passant to the right
+            if (canEnPassant(board, startPosition, verticalDirection, false)) {
+                validMoves.add(new ChessMove(startPosition, new ChessPosition(startPosition.getRow()+verticalDirection, startPosition.getColumn()-1), null));
+            }
+        }
+
+
         // king castling check, canCastle handles the king being safe logic
         if (piece.getPieceType() == ChessPiece.PieceType.KING && !piece.hasMoved()) {
             // kingside castle
@@ -265,6 +281,12 @@ public class ChessGame {
         }
         return true;
     }
+
+    private boolean canEnPassant(ChessBoard board, ChessPosition pawnPos, int verticalDirection, boolean rightSide) {
+
+    }
+
+
     /**
      *
      * @return a list of all the positions on the board
