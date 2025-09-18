@@ -72,6 +72,17 @@ public class ChessGame {
             board.addPiece(move.getEndPosition(), capturedPiece);
         }
 
+        // king castling check, canCastle handles the king being safe logic
+        if (piece.getPieceType() == ChessPiece.PieceType.KING && !piece.hasMoved()) {
+            // kingside castle
+            if (canCastle(board, startPosition, true)) {
+                validMoves.add(new ChessMove(startPosition, new ChessPosition(startPosition.getRow(), 7), null));
+            }
+            // queenside castle
+            if (canCastle(board, startPosition, false)) {
+                validMoves.add(new ChessMove(startPosition, new ChessPosition(startPosition.getRow(), 3), null));
+            }
+        }
         return validMoves;
     }
 
@@ -92,31 +103,58 @@ public class ChessGame {
             throw new InvalidMoveException("Move not valid");
         }
 
-        // Save captured piece for undo
+        // save captured piece info for undoing the temp move
         ChessPiece capturedPiece = board.getPiece(move.getEndPosition());
         ChessPiece.PieceType promotionType = move.getPromotionPiece();
 
-        // Execute move (check if it's a promoting pawn)
+        // execute move (check if it's a promoting pawn)
         if (promotionType == null) {
             board.addPiece(move.getEndPosition(), movingPiece);
-
         }
         else {
             board.addPiece(move.getEndPosition(), new ChessPiece(teamTurn, promotionType));
         }
         board.addPiece(move.getStartPosition(), null);
-        // turn flag to true so we know piece has moved, and can't castle
-        board.getPiece(move.getEndPosition()).hasMadeMoveFlagTrue();
 
-        // Check if move leaves own king in check
+        // check if move leaves own king in check
         if (isInCheck(teamTurn)) {
-            // Undo move
+            // undo temp move
             board.addPiece(move.getStartPosition(), movingPiece);
             board.addPiece(move.getEndPosition(), capturedPiece);
             throw new InvalidMoveException("Move leaves king in check");
         }
 
-        // Switch turn
+        // handle the castling move for the rook if piece is a king
+        if (movingPiece.getPieceType() == ChessPiece.PieceType.KING) {
+            int startCol = move.getStartPosition().getColumn();
+            int endCol = move.getEndPosition().getColumn();
+            int row = move.getStartPosition().getRow();
+
+            // check if king moves 2 spots to right for kingside castle
+            if (startCol == 5 && endCol == 7) {
+                ChessPosition rookStart = new ChessPosition(row, 8);
+                ChessPosition rookEnd = new ChessPosition(row, 6);
+                ChessPiece rook = board.getPiece(rookStart);
+                board.addPiece(rookEnd, rook);
+                board.addPiece(rookStart, null);
+                rook.setMoved();
+            }
+
+            // check if king moves 2 spots to left for queenside castle
+            else if (startCol == 5 && endCol == 3) {
+                ChessPosition rookStart = new ChessPosition(row, 1);
+                ChessPosition rookEnd = new ChessPosition(row, 4);
+                ChessPiece rook = board.getPiece(rookStart);
+                board.addPiece(rookEnd, rook);
+                board.addPiece(rookStart, null);
+                rook.setMoved();
+            }
+        }
+
+        // turn flag to true so we know piece has moved, and can't castle (this flag won't affect moves of non-kings/rooks)
+        board.getPiece(move.getEndPosition()).setMoved();
+
+        // switch team turn after move
         teamTurn = (teamTurn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
     }
 
@@ -193,6 +231,40 @@ public class ChessGame {
         return false;
     }
 
+    /**
+     *
+     * @param board chess board
+     * @param  kingPos kings starting position
+     * @param kingside boolean that says which direction king is trying to castle
+     * @return boolean if the king can castle to that side
+     */
+    private boolean canCastle(ChessBoard board, ChessPosition kingPos, boolean kingside) {
+        int row = kingPos.getRow();
+        int rookCol = kingside ? 8 : 1;
+        int step = kingside ? 1 : -1;
+        TeamColor enemyColor = (board.getPiece(kingPos).getTeamColor() == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
+
+        // check that the rook is in original place and hasn't moved
+        ChessPiece rook = board.getPiece(new ChessPosition(row, rookCol));
+        if (rook == null || rook.getPieceType() != ChessPiece.PieceType.ROOK || rook.hasMoved()) {
+            return false;
+        }
+
+        // check that the squares between the rook and king are empty
+        for (int col = kingPos.getColumn() + step; col != rookCol; col += step) {
+            if (board.getPiece(new ChessPosition(row, col)) != null) {
+                return false;
+            }
+        }
+
+        // check that none of the positions that the king has to move into or end on would be under check
+        for (int col = kingPos.getColumn(); col != kingPos.getColumn() + 3 * step; col += step) {
+            if (isPositionAttacked(enemyColor, new ChessPosition(row, col))) {
+                return false;
+            }
+        }
+        return true;
+    }
     /**
      *
      * @return a list of all the positions on the board
