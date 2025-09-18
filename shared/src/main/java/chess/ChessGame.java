@@ -2,7 +2,6 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Objects;
 
 /**
@@ -54,10 +53,6 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
-        if (piece == null || piece.getTeamColor() != teamTurn) {
-            Collections.emptyList();
-        }
-
         Collection<ChessMove> potentialMoves = piece.pieceMoves(board, startPosition);
         Collection<ChessMove> validMoves = new java.util.ArrayList<>();
 
@@ -140,6 +135,11 @@ public class ChessGame {
         return isPositionAttacked(enemyColor, kingPos);
     }
 
+    /**
+     *
+     * @param teamColor team of king we're looking for
+     * @return position of king, null if we can't find him, that shouldn't happen
+     */
     private ChessPosition findKingPosition(TeamColor teamColor) {
         Collection<ChessPosition> positions = getAllBoardPositions();
         for (ChessPosition pos : positions) {
@@ -154,6 +154,13 @@ public class ChessGame {
         return null;
     }
 
+
+    /**
+     *
+     * @param attackingColor the enemy team
+     * @param attackedPosition the position of the friendly king
+     * @return true if friendly king is under attack, otherwise false
+     */
     private boolean isPositionAttacked(TeamColor attackingColor, ChessPosition attackedPosition) {
         Collection<ChessPosition> positions = getAllBoardPositions();
         for (ChessPosition pos : positions) {
@@ -163,6 +170,14 @@ public class ChessGame {
         }
         return false;
     }
+
+    /**
+     *
+     * @param attackingColor the enemy team
+     * @param pos the pos of the piece potentially attacking king
+     * @param target the position of the friendly king
+     * @return true if friendly king is under attack by piece in pos, otherwise false
+     */
     private boolean isEnemyAttacking(TeamColor attackingColor, ChessPosition pos, ChessPosition target) {
         ChessPiece piece = board.getPiece(pos);
         if (piece == null || piece.getTeamColor() != attackingColor) {
@@ -176,6 +191,10 @@ public class ChessGame {
         return false;
     }
 
+    /**
+     *
+     * @return a list of all the positions on the board
+     */
     private Collection<ChessPosition> getAllBoardPositions() {
         Collection<ChessPosition> positions = new ArrayList<>();
         for (int row = 1; row <= 8; row++) {
@@ -208,6 +227,13 @@ public class ChessGame {
         return true;
     }
 
+    /**
+     *
+     * @param startPos the starting position of the piece attempting to move
+     * @param piece the piece attempting to move
+     * @param teamColor which team is under threat
+     * @return true if the king can escape, false otherwise
+     */
     private boolean hasEscapingMove(ChessPosition startPos, ChessPiece piece, TeamColor teamColor) {
         Collection<ChessMove> moves = validMoves(startPos);
         if (moves == null) {
@@ -222,6 +248,14 @@ public class ChessGame {
         return false;
     }
 
+    /**
+     *
+     * @param startPos the start position of piece attempting to move
+     * @param piece the piece moving
+     * @param move the move it makes
+     * @param teamColor which team to check for check
+     * @return True if the king escapes check with move, otherwise false
+     */
     private boolean simulateMoveDoesEscapeCheck(ChessPosition startPos, ChessPiece piece, ChessMove move, TeamColor teamColor) {
         ChessPiece captured = board.getPiece(move.getEndPosition());
 
