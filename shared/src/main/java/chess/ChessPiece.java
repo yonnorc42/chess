@@ -14,11 +14,13 @@ public class ChessPiece {
     private final ChessGame.TeamColor pieceColor;
     private final PieceType type;
     private final PieceMovesCalculator movesCalculator;
+    private boolean hasMoved;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
         this.movesCalculator = createCalculator(type);
+        this.hasMoved = false;
     }
 
     /**
@@ -67,6 +69,14 @@ public class ChessPiece {
             case QUEEN -> new QueenMovesCalculator();
             case PAWN -> new PawnMovesCalculator();
         };
+    }
+
+    public void hasMadeMoveFlagTrue() {
+        hasMoved = true;
+    }
+
+    public boolean hasMadeMove() {
+        return hasMoved;
     }
 
     @Override

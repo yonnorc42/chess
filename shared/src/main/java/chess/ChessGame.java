@@ -105,6 +105,8 @@ public class ChessGame {
             board.addPiece(move.getEndPosition(), new ChessPiece(teamTurn, promotionType));
         }
         board.addPiece(move.getStartPosition(), null);
+        // turn flag to true so we know piece has moved, and can't castle
+        board.getPiece(move.getEndPosition()).hasMadeMoveFlagTrue();
 
         // Check if move leaves own king in check
         if (isInCheck(teamTurn)) {
