@@ -80,14 +80,15 @@ public class ChessGame {
         if (piece.getPieceType() == ChessPiece.PieceType.PAWN && startPosition.getRow() == enPassantRow) {
             // check for en passant to the right
             if (canEnPassant(board, startPosition, true)) {
-                validMoves.add(new ChessMove(startPosition, new ChessPosition(startPosition.getRow()+verticalDirection, startPosition.getColumn()+1), null));
+                validMoves.add(new ChessMove(startPosition,
+                        new ChessPosition(startPosition.getRow()+verticalDirection, startPosition.getColumn()+1), null));
             }
             // check for en passant to the left
             if (canEnPassant(board, startPosition, false)) {
-                validMoves.add(new ChessMove(startPosition, new ChessPosition(startPosition.getRow()+verticalDirection, startPosition.getColumn()-1), null));
+                validMoves.add(new ChessMove(startPosition,
+                        new ChessPosition(startPosition.getRow()+verticalDirection, startPosition.getColumn()-1), null));
             }
         }
-
 
         // king castling check, canCastle handles the king being safe logic
         if (piece.getPieceType() == ChessPiece.PieceType.KING && !piece.hasMoved()) {
@@ -102,7 +103,6 @@ public class ChessGame {
         }
         return validMoves;
     }
-
     /**
      * Makes a move in a chess game
      *
@@ -125,7 +125,7 @@ public class ChessGame {
         ChessPiece capturedPiece = board.getPiece(move.getEndPosition());
         ChessPiece.PieceType promotionType = move.getPromotionPiece();
 
-        // ==== En Passant special case ====
+        // en passant special case
         boolean isEnPassant = false;
         if (movingPiece.getPieceType() == ChessPiece.PieceType.PAWN
                 && capturedPiece == null
@@ -141,7 +141,7 @@ public class ChessGame {
             board.addPiece(capturedPawnPos, null); // remove captured pawn
         }
 
-        // ==== Execute move (promotion handled here) ====
+        // execute move (promotion logic here)
         if (promotionType == null) {
             board.addPiece(move.getEndPosition(), movingPiece);
         } else {
@@ -149,7 +149,7 @@ public class ChessGame {
         }
         board.addPiece(move.getStartPosition(), null);
 
-        // ==== Check if move leaves own king in check ====
+        // check if move leaves king in check
         if (isInCheck(teamTurn)) {
             // undo en passant if needed
             if (isEnPassant) {
@@ -166,8 +166,7 @@ public class ChessGame {
             board.addPiece(move.getEndPosition(), capturedPiece);
             throw new InvalidMoveException("Move leaves king in check");
         }
-
-        // ==== Handle castling rook move ====
+        // handle castling rook move here
         if (movingPiece.getPieceType() == ChessPiece.PieceType.KING) {
             int startCol = move.getStartPosition().getColumn();
             int endCol = move.getEndPosition().getColumn();
@@ -192,16 +191,11 @@ public class ChessGame {
 
         // set last move for checking en passant
         lastMove = move;
-
         // mark piece as moved
         board.getPiece(move.getEndPosition()).setMoved();
-
         // switch turn
         teamTurn = (teamTurn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
-
     }
-
-
     /**
      * Determines if the given team is in check
      *
@@ -218,7 +212,6 @@ public class ChessGame {
         // check if king is attacked
         return isPositionAttacked(enemyColor, kingPos);
     }
-
     /**
      *
      * @param teamColor team of king we're looking for
@@ -237,8 +230,6 @@ public class ChessGame {
         // THIS SHOULD NEVER HAPPEN
         return null;
     }
-
-
     /**
      *
      * @param attackingColor the enemy team
@@ -274,7 +265,6 @@ public class ChessGame {
         }
         return false;
     }
-
     /**
      *
      * @param board chess board
@@ -300,7 +290,6 @@ public class ChessGame {
                 return false;
             }
         }
-
         // check that none of the positions that the king has to move into or end on would be under check
         for (int col = kingPos.getColumn(); col != kingPos.getColumn() + 3 * step; col += step) {
             if (isPositionAttacked(enemyColor, new ChessPosition(row, col))) {
@@ -309,7 +298,6 @@ public class ChessGame {
         }
         return true;
     }
-
     /**
      *
      * @param board our chess board
@@ -349,7 +337,6 @@ public class ChessGame {
         if (!lastMove.getEndPosition().equals(adjPos)) {
             return false;
         }
-
         // the piece that moved must have been a pawn and must have moved two squares
         int startRow = lastMove.getStartPosition().getRow();
         int endRow = lastMove.getEndPosition().getRow();
@@ -378,7 +365,6 @@ public class ChessGame {
 
         return !leavesKingInCheck;
     }
-
     /**
      *
      * @return a list of all the positions on the board
@@ -392,7 +378,6 @@ public class ChessGame {
         }
         return positions;
     }
-
     /**
      * Determines if the given team is in checkmate
      *
@@ -414,7 +399,6 @@ public class ChessGame {
         }
         return true;
     }
-
     /**
      *
      * @param startPos the starting position of the piece attempting to move
@@ -435,7 +419,6 @@ public class ChessGame {
         }
         return false;
     }
-
     /**
      *
      * @param startPos the start position of piece attempting to move
@@ -457,7 +440,6 @@ public class ChessGame {
 
         return escapesCheck;
     }
-
     /**
      * Determines if the given team is in stalemate, which here is defined as having
      * no valid moves while not in check.
@@ -479,7 +461,6 @@ public class ChessGame {
         }
         return true;
     }
-
     /**
      * Sets this game's chessboard with a given board
      *
@@ -488,7 +469,6 @@ public class ChessGame {
     public void setBoard(ChessBoard board) {
         this.board = board;
     }
-
     /**
      * Gets the current chessboard
      *
@@ -497,7 +477,6 @@ public class ChessGame {
     public ChessBoard getBoard() {
         return board;
     }
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
@@ -506,7 +485,6 @@ public class ChessGame {
         ChessGame chessGame = (ChessGame) o;
         return Objects.equals(board, chessGame.board) && teamTurn == chessGame.teamTurn;
     }
-
     @Override
     public int hashCode() {
         return Objects.hash(board, teamTurn);
